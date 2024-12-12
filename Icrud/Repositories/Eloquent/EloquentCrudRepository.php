@@ -611,6 +611,7 @@ abstract class EloquentCrudRepository extends EloquentBaseRepository implements 
     //get model and update
     $model = $query->where($field ?? 'id', $criteria)->first();
     if (isset($model)) {
+      $data['id'] = $model->id;
       $this->beforeUpdate($data);
       //Update Model
       $model->update((array)$data);
