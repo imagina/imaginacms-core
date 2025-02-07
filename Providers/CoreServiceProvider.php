@@ -443,7 +443,7 @@ class CoreServiceProvider extends ServiceProvider
                 $this->foreign('deleted_by')->references('id')->on(config('auth.table', 'users'))->onDelete('restrict');
             }
             //Organization id
-            $organizationTable = 'isite__organizations';
+            $organizationTable = 'itenant__organizations';
             if ($this->getTable() != $organizationTable) {
                 if (! \Schema::hasColumn($this->getTable(), 'organization_id')) {
                     $this->integer('organization_id')->unsigned()->nullable();
