@@ -25,6 +25,29 @@ class MigrateService
 
 
   /**
+   * Migrate and Copy Data Only
+   * @param $modules array
+   */
+  public function migrateAndCopyDataFromModules($modules)
+  {
+
+    \Log::info($this->log . "install");
+
+    //Get Tables to migrate and sync
+    $tables = $this->getMainTables(array_column($modules, 'dbPrefix'));
+
+    //Sync tables from base tenant with the tenant created
+    $this->syncTables($tables);
+
+    //Copy Media Data
+    $this->copyMediaData($modules);
+
+    //Copy Fillable Data
+    $this->copyFillableData($modules);
+
+  }
+
+  /**
    * Get the main tables to Migrate
    * @param $prefixes (Tables)
    */
@@ -94,57 +117,61 @@ class MigrateService
 
   /**
    * Sync Table
-   * @param $tableName (Table to sync)
-   * @para $copyData (If copy the data or only create the table)
+   * @param $tables (Tables to sync)
+   * @param $copyData (If copy the data or only create the table)
    */
-  public function syncTable(string $tableName,$copyData = true)
+  public function syncTables(array $tables,$copyData = true)
   {
 
-    if (!\Schema::hasTable($tableName)) {
+    foreach ($tables as $tableName) {
 
-      \DB::statement('SET FOREIGN_KEY_CHECKS=0');
+      if (!\Schema::hasTable($tableName)) {
 
-      $moduleName = explode("__", $tableName);
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
-      // Create table schema
-      $createTableSql = \DB::connection($this->baseConnection)->select("SHOW CREATE TABLE `$tableName`")[0]->{'Create Table'};
-      \DB::statement($createTableSql);
+        $moduleName = explode("__", $tableName);
 
-      // Reset auto increment Only case Ilocations
-      if ($moduleName[0] == 'ilocations') \DB::statement("ALTER TABLE `$tableName` AUTO_INCREMENT = 1");
+        // Create table schema
+        $createTableSql = \DB::connection($this->baseConnection)->select("SHOW CREATE TABLE `$tableName`")[0]->{'Create Table'};
+        \DB::statement($createTableSql);
 
-      // Validation to Copy Data
-      if($copyData){
+        // Reset auto increment Only case Ilocations
+        if ($moduleName[0] == 'ilocations') \DB::statement("ALTER TABLE `$tableName` AUTO_INCREMENT = 1");
 
-        //Ilocations will be seeder later || No copy data to Media | No Copy data Ifillable
-        if ($moduleName[0] != 'ilocations' && $moduleName[0] != 'media' && $moduleName[0] != 'ifillable') {
+        // Validation to Copy Data
+        if($copyData){
 
-          //insert data table
-          $data = \DB::connection($this->baseConnection)->table($tableName)->get();
+          //Ilocations will be seeder later || No copy data to Media | No Copy data Ifillable
+          if ($moduleName[0] != 'ilocations' && $moduleName[0] != 'media' && $moduleName[0] != 'ifillable') {
 
-          if ($data->isNotEmpty()) {
-            // Convert the data into an array with keys (column names preserved)
-            $formattedData = $data->map(function ($item) {
-              $itemArray = (array) $item; // Convert each item to an associative array
+            //insert data table
+            $data = \DB::connection($this->baseConnection)->table($tableName)->get();
 
-              //Set organization id in table
-              if (array_key_exists('organization_id', $itemArray)) {
-                $itemArray['organization_id'] = $this->organization->id;
-              }
-              return $itemArray;
-            })->toArray();
+            if ($data->isNotEmpty()) {
+              // Convert the data into an array with keys (column names preserved)
+              $formattedData = $data->map(function ($item) {
+                $itemArray = (array) $item; // Convert each item to an associative array
 
-            \DB::table($tableName)->insert($formattedData);
+                //Set organization id in table
+                if (array_key_exists('organization_id', $itemArray)) {
+                  $itemArray['organization_id'] = $this->organization->id;
+                }
+                return $itemArray;
+              })->toArray();
+
+              \DB::table($tableName)->insert($formattedData);
+            }
           }
+
+          //Update organization Id
+          if ($tableName == 'itenant__organizations') \DB::table($tableName)->update(['id' => $this->organization->id]);
+
+          \Log::info("$this->log syncTable: $tableName");
         }
 
-        //Update organization Id
-        if ($tableName == 'itenant__organizations') \DB::table($tableName)->update(['id' => $this->organization->id]);
-
-        \Log::info("$this->log syncTable: $tableName");
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1');
       }
 
-      \DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 
   }
