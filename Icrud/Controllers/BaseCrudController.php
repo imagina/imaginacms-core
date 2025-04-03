@@ -307,22 +307,23 @@ class BaseCrudController extends BaseApiController
 
     \DB::beginTransaction(); //DB Transaction
     try {
-      
+
       $items = $request->input('items') ?? null;
       $params = $this->getParamsRequest($request);
 
       //Only in dev mode
       if(app()->environment('local')){
         if(isset($params->filter) && isset($params->filter->generateTestingData) && $params->filter->generateTestingData)
-          $items = generateTestingData($params->filter->generateTestingData);
+          $prefix = $request->input('prefix') ?? "";
+          $items = generateTestingData($params->filter->generateTestingData,$prefix);
       }
-      
+
       //Init Service
       $bulkService = app()->makeWith(BulkService::class,['params' => ['controller'=> $this, 'items'=> $items]]);
 
       //Final Response
       $response = $bulkService->execute();
-    
+
       \DB::commit();//Commit to DataBase
     } catch (\Exception $e) {
       \DB::rollback();//Rollback to Data Base

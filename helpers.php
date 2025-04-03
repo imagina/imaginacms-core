@@ -29,7 +29,7 @@ if (! function_exists('is_module_enabled')) {
         $activator = app($activatorClass);
         return array_key_exists($module,array_intersect_key($activator->modulesStatuses,app('modules')->allEnabled()));
       }
-      
+
         return array_key_exists($module, app('modules')->allEnabled());
     }
 }
@@ -106,29 +106,70 @@ if (! function_exists('initProcessCache')) {
  * Generate testing data to test API BULK
  */
 if (! function_exists('generateTestingData')) {
-    function generateTestingData($n)
+    function generateTestingData($n,$prefix)
     {
         \Log::info("Core::Helper||generateTestingData");
 
         //Testing Data
         $products = [];
         for ($i = 1; $i <= $n; $i++) {
+
+            $name = $prefix.'Producto ' . $i;
+            $slug = $prefix.'-producto-' . $i;
+            $sku = $prefix.'-ab-' . $i;
+
             $products[] = [
                 'es' => [
-                    'name' => 'Producto ' . $i,
-                    'slug' => 'producto-' . $i,
+                    'name' => $name,
+                    'slug' => $slug,
                     'summary' => 'Esto es una prueba',
-                    'description' => 'esta es una prueba'
+                    'description' => 'esta es una prueba',
+                    "meta_title"=> $slug,
+                    "meta_description"=> $slug
                 ],
-                'category_id' => 1,
                 'quantity' => 9999,
                 'price' => '15000',
+                "status"=> 1,
+                "sku"=> $sku,
+                "date_available"=> "2016/12/31",
+                "length"=>0,
+                "width"=> 0,
+                "height"=> 0,
+                "minimum"=> 1,
+                "reference"=> $sku,
+                "shipping"=> true,
+                "show_price_is_call"=> "0",
+                "subtract"=> true,
+                "freeshipping"=> false,
+                "order_weight"=> 0,
+                "points"=> 0,
+                "meta_title"=> $slug,
+                "meta_description"=> $slug,
+                "is_call"=> "0",
+                "sort_order"=> "0",
+                "item_type_id"=> 1,
+                "custom_url"=> "",
+                "discounts"=> [],
                 'productWarehouses' => [
                     [
-                        'warehouse_id' => 2,
+                        'warehouse_id' => 1,
                         'quantity' => 10,
                     ],
+                    [
+                        'warehouse_id' => 2,
+                        'quantity' => 20,
+                    ],
+                    [
+                        'warehouse_id' => 3,
+                        'quantity' => 30,
+                    ],
                 ],
+                "category_id"=> 4,
+                "categories"=> [
+                    4,
+                    5,
+                    8
+                ]
             ];
         }
         return $products;
