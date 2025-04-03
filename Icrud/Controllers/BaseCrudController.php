@@ -313,9 +313,10 @@ class BaseCrudController extends BaseApiController
 
       //Only in dev mode
       if(app()->environment('local')){
-        if(isset($params->filter) && isset($params->filter->generateTestingData) && $params->filter->generateTestingData)
+        if(isset($params->filter) && isset($params->filter->generateTestingData) && $params->filter->generateTestingData){
           $prefix = $request->input('prefix') ?? "";
           $items = generateTestingData($params->filter->generateTestingData,$prefix);
+        }
       }
 
       //Init Service
