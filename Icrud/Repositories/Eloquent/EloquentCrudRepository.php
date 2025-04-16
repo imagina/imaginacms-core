@@ -298,6 +298,20 @@ abstract class EloquentCrudRepository extends EloquentBaseRepository implements 
                     array_merge($item, ['updated_at' => now(), 'created_at' => now()])
                   );
                 }
+
+                //if the model has custom events to be triggered, they are run in this segment
+                //TODO buscar la manera de separar updates de inserts en el DB anterior para poder
+                //disparar los eventos created o updated correspondientes, mientras tanto se dejó created por defecto
+                if(isset($relation["model"])){
+                  foreach ($relation["model"]::where($modelForeignKey, $model->id)->get() as $model){
+                    if(isset($relation["events"]["created"]) && !empty($relation["events"]["created"])){
+                      foreach ($relation["events"]["created"] as $event){
+                        event(new $event($model));
+                      }
+                    }
+                  }
+                }
+
                 $model->setRelation($relationName, $model->$relationName);
               }
             } else {
