@@ -86,8 +86,12 @@ class ProcessBulkItems implements ShouldQueue
                 $itemsCompleted[] = new $transformer($itemResult);
 
             } catch (\Exception $e) {
-                //dd($e);
-                $msjs[] = ['type' => "error",'operation' => $operation,'msjs' =>  $e->getMessage(),'item' => $item];
+                $msjs[] = [
+                  'type' => "error",
+                  'operation' => $operation,
+                  'msjs' =>  $e->getFile() . " -> " . $e->getLine()." -> ".$e->getMessage(),
+                  'item' => $item
+                ];
             }
         }
 

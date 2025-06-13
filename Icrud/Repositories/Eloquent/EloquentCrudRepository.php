@@ -303,10 +303,10 @@ abstract class EloquentCrudRepository extends EloquentBaseRepository implements 
                 //TODO buscar la manera de separar updates de inserts en el DB anterior para poder
                 //disparar los eventos created o updated correspondientes, mientras tanto se dejó created por defecto
                 if(isset($relation["model"])){
-                  foreach ($relation["model"]::where($modelForeignKey, $model->id)->get() as $model){
+                  foreach ($relation["model"]::where($modelForeignKey, $model->id)->get() as $subModel){
                     if(isset($relation["events"]["created"]) && !empty($relation["events"]["created"])){
                       foreach ($relation["events"]["created"] as $event){
-                        event(new $event($model));
+                        event(new $event($subModel));
                       }
                     }
                   }
