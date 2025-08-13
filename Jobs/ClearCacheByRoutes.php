@@ -39,7 +39,6 @@ class ClearCacheByRoutes implements ShouldQueue
     $domain = preg_replace("(^https?://)", "", config("app.url"));
 
     if (!empty($this->urls)) {
-      \Log::info(">>>>> " . json_encode($this->urls));
       foreach ($this->urls as $url) {
         try {
           \Log::info('CACHE::RUNING ' . $url);
