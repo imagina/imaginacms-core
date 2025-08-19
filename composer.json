@@ -1,28 +1,30 @@
 {
-    "name": "imagina/icore",
-    "description": "Shared CRUD base for Imagina modules",
-    "autoload": {
-        "psr-4": {
-            "Imagina\\Icore\\": "src"
-        },
-        "files": [
-            "src/Support/helpers.php"
-        ]
+  "name": "imagina/core-module",
+  "type": "laravel-module",
+  "license": "MIT",
+  "description": "Shared CRUD base for Imagina modules",
+  "autoload": {
+    "psr-4": {
+      "Imagina\\Icore\\": "src"
     },
-    "authors": [
-        {
-            "name": "msolanogithub",
-            "email": "msolano@imaginacolombia.com"
-        }
-    ],
-    "require": {
-        "astrotomic/laravel-translatable": "11.*"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Imagina\\Icore\\Providers\\IcoreServiceProvider"
-            ]
-        }
+    "files": [
+      "src/Support/helpers.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "msolanogithub",
+      "email": "msolano@imaginacolombia.com"
     }
+  ],
+  "require": {
+    "astrotomic/laravel-translatable": "11.*"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Imagina\\Icore\\Providers\\IcoreServiceProvider"
+      ]
+    }
+  }
 }
