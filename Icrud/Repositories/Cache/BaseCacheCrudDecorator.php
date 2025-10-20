@@ -11,6 +11,12 @@ abstract class BaseCacheCrudDecorator extends BaseCacheDecorator implements Base
 {
   public function getItemsBy($params)
   {
+
+    //Extra validation important to exports.
+    if (!empty($params->returnAsQuery)) {
+      return $this->repository->getItemsBy($params); // Bypass cache
+    }
+
     $query = $this->repository->getOrCreateQuery($params);
 
     return $this->remember(function () use ($params) {
@@ -119,5 +125,4 @@ abstract class BaseCacheCrudDecorator extends BaseCacheDecorator implements Base
     $this->cache->tags($this->getTags())->flush();
     return $this->repository->updateOrCreate($validationData, $data);
   }
-
 }
